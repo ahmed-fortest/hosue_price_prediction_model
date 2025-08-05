@@ -4,6 +4,8 @@ import numpy as np
 
 app = Flask(__name__)
 
+model = None
+
 try:
     model = joblib.load('randomforest_model.pkl')
 except Exception as e:
@@ -15,8 +17,11 @@ def home():
 
 @app.route('/predict', methods=['POST'])
 def predict():
+    global model  # اجعل المتغير model معروف داخل الدالة
     try:
-     
+        if model is None:
+            raise Exception("النموذج غير محمل")
+
         area = float(request.form['area'])
         bedrooms = int(request.form['bedrooms'])
         bathrooms = int(request.form['bathrooms'])
@@ -30,7 +35,6 @@ def predict():
         prefarea = int(request.form['prefarea'])
         furnishingstatus = int(request.form['furnishingstatus'])
 
-       
         input_data = np.array([[area, bedrooms, bathrooms, stories,
                                 mainroad, guestroom, basement,
                                 hotwaterheating, airconditioning,
@@ -47,5 +51,3 @@ def predict():
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=10000, debug=False)
-
-
