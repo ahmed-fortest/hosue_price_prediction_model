@@ -5,7 +5,7 @@ import numpy as np
 app = Flask(__name__)
 
 try:
-    model = joblib.load('house_model.pkl')
+    model = joblib.load('randomforest_model.pkl')
 except Exception as e:
     print("خطأ في تحميل النموذج:", e)
 
@@ -47,3 +47,4 @@ def predict():
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=10000, debug=False))
+
