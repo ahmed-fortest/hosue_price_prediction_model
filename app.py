@@ -1,15 +1,23 @@
 from flask import Flask, render_template, request
 import joblib
 import numpy as np
+import os
 
 app = Flask(__name__)
 
-model = None
+# طباعة معلومات مسار العمل والملفات للتأكد
+print("Current working directory:", os.getcwd())
+print("Files in directory:", os.listdir())
+
+# تحديد مسار النموذج بشكل صريح بناءً على مكان هذا الملف
+model_path = os.path.join(os.path.dirname(__file__), 'randomforest_model.pkl')
 
 try:
-    model = joblib.load('randomforest_model.pkl')
+    model = joblib.load(model_path)
+    print("تم تحميل النموذج بنجاح من:", model_path)
 except Exception as e:
     print("خطأ في تحميل النموذج:", e)
+    model = None  # لتفادي الخطأ في حالة عدم التحميل
 
 @app.route('/')
 def home():
@@ -17,11 +25,11 @@ def home():
 
 @app.route('/predict', methods=['POST'])
 def predict():
-    global model  # اجعل المتغير model معروف داخل الدالة
-    try:
-        if model is None:
-            raise Exception("النموذج غير محمل")
+    if model is None:
+        error = "النموذج غير محمل، يرجى التأكد من وجود ملف النموذج."
+        return render_template('index.html', result=error)
 
+    try:
         area = float(request.form['area'])
         bedrooms = int(request.form['bedrooms'])
         bathrooms = int(request.form['bathrooms'])
